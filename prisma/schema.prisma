@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  sites     Site[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Site {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  subdomain     String?        @unique // e.g., "coolshoes" -> coolshoes.myplatform.com
+  customDomain  String?        @unique // e.g., "coolshoes.com"
+  logo          String?
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products      Product[]
+  settings      SiteSettings?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([subdomain])
+}
+
+model SiteSettings {
+  id                 String  @id @default(cuid())
+  siteId             String  @unique
+  site               Site    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  nowPaymentsApiKey  String? // The merchant's crypto API key
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  currency    String   @default("USD")
+  image       String?
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
