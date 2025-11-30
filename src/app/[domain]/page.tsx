@@ -58,7 +58,19 @@ export default async function SiteHomePage({
             ) : (
                 data.products.map((product) => (
                     <Card key={product.id} className="hover:shadow-lg transition-shadow duration-300">
-                        <div className="h-48 bg-slate-200 w-full rounded-t-xl animate-pulse" /> {/* Placeholder Image */}
+                        <div className="relative h-48 w-full">
+    {product.image ? (
+        <img 
+            src={product.image} 
+            alt={product.name} 
+            className="h-full w-full object-cover rounded-t-xl"
+        />
+    ) : (
+        <div className="h-full w-full bg-slate-200 rounded-t-xl flex items-center justify-center text-slate-400">
+            No Image
+        </div>
+    )}
+</div>
                         <CardHeader>
                             <CardTitle>{product.name}</CardTitle>
                         </CardHeader>
