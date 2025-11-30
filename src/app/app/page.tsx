@@ -2,15 +2,31 @@
 
 import Canvas from "@/components/builder/Canvas";
 import { useEditorStore } from "@/stores/editor";
-import { LayoutTemplate, Type, ShoppingCart } from "lucide-react";
+import { saveSiteContent } from "@/actions/builder";
+import { LayoutTemplate, Type, ShoppingCart, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function DashboardPage() {
-  const { addBlock } = useEditorStore();
+  const { addBlock, blocks } = useEditorStore();
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await saveSiteContent(blocks);
+      alert("Website Published Successfully! Check your live link.");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save website.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-[calc(100vh-64px)] bg-gray-100">
       {/* Sidebar (Toolbar) */}
-      <aside className="w-64 border-r bg-white p-6">
+      <aside className="w-64 border-r bg-white p-6 overflow-y-auto">
         <h2 className="mb-6 text-xl font-bold">Builder Tools</h2>
         
         <div className="space-y-3">
@@ -43,9 +59,14 @@ export default function DashboardPage() {
       {/* Main Area (Canvas) */}
       <main className="flex-1 overflow-y-auto p-10">
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Editing: My Cool Store</h1>
-          <button className="rounded-full bg-black px-6 py-2 text-white hover:bg-gray-800">
-            Publish Changes
+          <h1 className="text-2xl font-bold">Editing: My Store</h1>
+          <button 
+            onClick={handleSave}
+            disabled={saving}
+            className="rounded-full bg-black px-6 py-2 text-white hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2"
+          >
+            {saving && <Loader2 className="animate-spin h-4 w-4" />}
+            {saving ? "Publishing..." : "Publish Changes"}
           </button>
         </div>
         
